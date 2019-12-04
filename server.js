@@ -1,5 +1,5 @@
 const express = require('express');
-
+const userRouter = require('./users/userRouter.js');
 const server = express();
 
 server.get('/', logger, (req, res) => {
@@ -15,5 +15,6 @@ function logger(req, res, next) {
 
 server.use(express.json());
 server.use(logger);
+server.use('/api/users', userRouter); // everything in userRouter has /api/users
 
 module.exports = server;

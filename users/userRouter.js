@@ -19,9 +19,29 @@ router.post('/', validateUserId, validateUser, (req, res) => {
   
 });
 
-router.post('/:id/posts', (req, res) => {
-  
+router.post('/:id/posts', validatePost, (req, res) => {
+  const id = req.params.id;
+  // const newPost = req.body;
+  const newPost = { user_id: req.params.id, text: req.body.text }
+  user.getById(id)        // getting the user by the specific ID
+  .then(user => {         // returns promise
+    if (user) {           // that, if there is a user, then
+      Posts.insert(newPost)  // use INSERT to add new post to database
+      .then(post => {      // a promise --
+        res.status(201).json(post) // --> to return the newly created Post
+      }) 
+      .catch(error => { 
+        res.status(500).json({ errorMessage: 'Post cannot be created', error }) // if there is error with the first then
+      })
+    } else { // if there is no user found from line 27, then return 404
+      res.status(404).json({ errorMessage: 'The user with the specified ID cannot be found' })
+    }
+  })
+  .catch(error => { // if there is error with the whole thing, return 500
+    res.status(500).json({ errorMessage: 'There was an error saving new post! Bummer.', error })
+  })
 });
+
 
 router.get('/', validateUserId, (req, res) => {
   const userData = req.body;
@@ -84,7 +104,24 @@ router.delete('/:id', validateUserId, (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-  
+  const name = req.body;
+  const id = req.params.id;
+
+  if (!name) {
+    res.status(400).json({ errorMessage: 'Please provide a name for the user!' })
+  } else {
+    user.update(id, name)
+    .then(editedUser => {
+      if (editedUser) {
+        res.status(200).json(editedUser)
+      } else {
+        res.status(404).json({ errorMessage: 'The user with the specified ID could not be found' })
+      }
+    })
+    .catch(error => {
+      res.status(500).json({ errorMessage: 'The user information could not be modified', error })
+    })
+  }
 });
 
 //custom middleware

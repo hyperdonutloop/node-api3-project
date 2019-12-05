@@ -67,8 +67,20 @@ router.get('/:id/posts', validateUserId, (req, res) => {
   })
 });
 
-router.delete('/:id', (req, res) => {
-  
+router.delete('/:id', validateUserId, (req, res) => {
+  const id = req.params.id;
+
+  user.remove(id)
+  .then(user => {
+    if (user) {
+      res.status(200).json({ message: 'The user has been terminated!' })
+    } else {
+      res.status(404).json({ errorMessage: 'The user does not exist' })
+    }
+  })
+  .catch(error => {
+    res.status(500).json({ errorMessage: 'The user could not be removed', error })
+  })
 });
 
 router.put('/:id', (req, res) => {

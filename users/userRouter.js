@@ -36,7 +36,19 @@ router.get('/', validateUserId, (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  
+  const id = req.params.id;
+
+  user.getById(id)
+  .then(user => {
+    if (user) {
+      res.status(200).json(user)
+    } else {
+      res.status(404).json({ errorMessage: 'The user does not exist'})
+    }
+  })
+  .catch(error => {
+    res.status(500).json({ errorMessage: 'Error retrieving user with specified ID', error})
+  })
 });
 
 router.get('/:id/posts', (req, res) => {

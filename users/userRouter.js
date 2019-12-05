@@ -16,17 +16,6 @@ router.post('/', validateUserId, validateUser, (req, res) => {
   .catch(error => {
     res.status(500).json({ errorMessage: 'There was an error adding user.', error })
   })
-  // if(!text || !user_id) {
-  //   res.status(400).json({ errorMessage: 'Please provide text and user ID for post.' })
-  // } else {
-  //   Posts.insert(req.body)
-  // .then(post => {
-  //   res.status(201).json(post)
-  // })
-  // .catch(error => {
-  //   res.status(500).json({ errorMessage: 'There was an error while saving post to database.', error })
-  // })
-  // }
   
 });
 
@@ -61,7 +50,6 @@ function validateUserId(req, res, next) {
     .then(users => {
       if (users) {
         req.user = user
-        // res.status(200).json(user)
       } else {
         res.status(400).json({ errorMessage: 'invalid user ID' })
       }
@@ -82,7 +70,15 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  
+  const postData = req.body;
+
+  if (postData) {
+    res.status(400).json({ errorMessage: 'missing post data' })
+  } else if (!postData.text) {
+    res.status(400).json({ errorMessage: 'missing required text field' })
+  } else {
+    next();
+  }
 }
 
 module.exports = router;

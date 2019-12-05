@@ -51,8 +51,20 @@ router.get('/:id', (req, res) => {
   })
 });
 
-router.get('/:id/posts', (req, res) => {
-  
+router.get('/:id/posts', validateUserId, (req, res) => {
+ const id = req.params.id;
+
+ user.getUserPosts(id)
+  .then(userPost => {
+    if (userPost) {
+      res.status(200).json(userPost)
+    } else {
+      res.status(404).json({ errorMessage: 'The post for this user could not be found' })
+    }
+  })
+  .catch(error => {
+    res.status(500).json({ errorMessage: 'error getting post information', error })
+  })
 });
 
 router.delete('/:id', (req, res) => {

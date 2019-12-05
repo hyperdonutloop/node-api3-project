@@ -23,8 +23,16 @@ router.post('/:id/posts', (req, res) => {
   
 });
 
-router.get('/', (req, res) => {
-  
+router.get('/', validateUserId, (req, res) => {
+  const userData = req.body;
+
+  user.get(userData)
+  .then(users => {
+    res.status(200).json(users)
+  })
+  .catch(error => {
+    res.status(500).json({ errorMessage: 'Error retrieving the users', error })
+  })
 });
 
 router.get('/:id', (req, res) => {
@@ -72,7 +80,7 @@ function validateUser(req, res, next) {
 function validatePost(req, res, next) {
   const postData = req.body;
 
-  if (postData) {
+  if (!postData) {
     res.status(400).json({ errorMessage: 'missing post data' })
   } else if (!postData.text) {
     res.status(400).json({ errorMessage: 'missing required text field' })
